@@ -32,7 +32,6 @@ public class slackService {
                     request,
                     String.class
             );
-
             if(response.getStatusCode()==HttpStatus.OK){
                 log.info("Slack message sent successfully to {}", channel);
                 return true;
