@@ -25,7 +25,22 @@ public class slackService {
                 log.info("Slack (SIMULATED) to {}: {}", channel, message);
                 return true;
             }
+        }catch(Exception e){
+            Log log=null;
+            log.error("Failed to send slack message :{}",e.getMessage());
+            throw new RuntimeException("Slack send failed",e);
         }
+    }
+    private String formatMessage(String message,String severity){
+        String label=switch(severity.toLowerCase()){
+            case "warning"->"⚠️";
+            case "urgent"->"🚨";
+            default->"ℹ️";
+        };
+        return label+severity.toUpperCase()+message;
+    }
+    public double cost(){
+        return 0.0;
     }
 
 }
