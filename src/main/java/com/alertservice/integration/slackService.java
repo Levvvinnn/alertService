@@ -5,6 +5,7 @@ import jdk.internal.org.jline.utils.Log;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,6 +26,21 @@ public class slackService {
                 log.info("Slack (SIMULATED) to {}: {}", channel, message);
                 return true;
             }
+
+            ResponseEntity<String> respone=restTemplate.postForEntity(
+                    webhookurl,
+                    request,
+                    String.class
+            );
+
+            if(response.getStatusCode()==HttpStatus.OK){
+                log.info("Slack message sent successfully to {}", channel);
+                return true;
+            } else {
+                log.error("Slack returned status: {}", response.getStatusCode());
+                return false;
+            }
+
         }catch(Exception e){
             Log log=null;
             log.error("Failed to send slack message :{}",e.getMessage());
