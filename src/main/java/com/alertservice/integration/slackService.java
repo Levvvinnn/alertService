@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
+
 
 @Service
 @Slf4j
@@ -18,6 +20,7 @@ public class slackService {
 
     private final RestTemplate restTemplate=new RestTemplate();
     private final ObjectMapper objectMapper=new ObjectMapper();
+    private Object request;
 
     public boolean sendSlackMessage(String channel,String message,String severity){
         try{
@@ -26,8 +29,7 @@ public class slackService {
                 log.info("Slack (SIMULATED) to {}: {}", channel, message);
                 return true;
             }
-
-            ResponseEntity<String> respone=restTemplate.postForEntity(
+            ResponseEntity<String> response=restTemplate.postForEntity(
                     webhookurl,
                     request,
                     String.class
@@ -48,8 +50,8 @@ public class slackService {
     }
     private String formatMessage(String message,String severity){
         String label=switch(severity.toLowerCase()){
-            case "warning"->"⚠️";
-            case "urgent"->"🚨";
+            case "critical"->"⚠️";
+            case "warning"->"🚨";
             default->"ℹ️";
         };
         return label+severity.toUpperCase()+message;

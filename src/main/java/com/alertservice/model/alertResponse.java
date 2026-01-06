@@ -20,14 +20,32 @@ public class alertResponse {
         private String message;
         private Double cost;
 
-        private String getChannel(){
+        public String getChannel(){
             return channel;
         }
+        public void setChannel(String channel){
+            this.channel=channel;
+        }
+        public void setCost(Double cost){
+            this.cost=cost;
+        }
+        public void setMessage(String message){
+            this.message=message;
+        }
+        public void setSuccess(boolean success){
+            this.success=success;
+        }
 
+        public Double getCost() {
+            return cost;
+        }
     }
 
     public void setId(UUID id){
         this.id=id;
+    }
+    public void setChannelResults(List<channelResult> results){
+        this.channelResults=results;
     }
 
     public void setMessage(String message){

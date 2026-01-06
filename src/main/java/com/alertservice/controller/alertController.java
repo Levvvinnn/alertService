@@ -2,6 +2,7 @@ package com.alertservice.controller;
 
 import com.alertservice.entity.alert;
 import com.alertservice.model.alertRequest;
+import com.alertservice.service.alertService;
 import com.alertservice.model.alertResponse;
 import jakarta.validation.Valid;
 import jdk.internal.org.jline.utils.Log;
@@ -21,6 +22,11 @@ import java.util.Map;
 public class alertController {
 
     private final alertService alertService;
+
+    public alertController(alertService alertService) {
+        this.alertService = alertService;
+    }
+
 
     @PostMapping("/alerts")
     public ResponseEntity<alertResponse> recieveWebhook(@Valid @RequestBody alertRequest request){

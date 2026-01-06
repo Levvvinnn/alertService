@@ -3,6 +3,7 @@ package com.alertservice.service;
 import com.alertservice.model.alertRequest;
 import com.alertservice.model.alertResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jdk.internal.org.jline.utils.Log;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class alertService {
             }
         }
         response.setChannelResults(results);
-
+        return response;
     }
 
     private List<String> determineChannels(alertRequest request){
@@ -62,7 +63,59 @@ public class alertService {
         };
     }
 
-    private alertResponse.channelResult sendToChannel(String channel){
+    private alertResponse.channelResult sendToChannel(String channel,String message,String severity,List<String> recipients){
+        alertResponse.channelResult result=new alertResponse.channelResult();
+        result.setChannel(channel);
+        try{
+            boolean success=switch(channel.toLowerCase()){
+                case "sms"->{
+                    String phone=getDefaultRecipient(recipients,"sms");
+                    boolean sent=smsService.sendSms(phone,message);
+                    result.setCost(smsService.cost());
+                    yield sent;
+                }
+                case "slack" -> {
+                    String slackChannel = getDefaultRecipient(recipients, "slack");
+                    boolean sent = slackService.sendSlackMessage(slackChannel, message, severity);
+                    result.setCost(slackService.cost());
+                    yield sent;
+                }
+                case "email" -> {
+                    String email = getDefaultRecipient(recipients, "email");
+                    String subject = String.format("[%s] Alert Notification", severity.toUpperCase());
+                    boolean sent = emailService.sendEmailTo(email, subject, message);
+                    result.setCost(emailService.cost());
+                    yield sent;
+                }
+                default -> {
+                    Log log=null;
+                    log.warn("Unknown channel: {}", channel);
+                    yield false;
+                }
+            };
+            result.setSuccess(success);
+            result.setMessage(success?"Sent successfully":"Failed to send");
+        } catch (Exception e) {
+            Log log=null;
+            log.error("Error sending to {}: {}", channel, e.getMessage());
+            result.setSuccess(false);
+            result.setMessage("Error: " + e.getMessage());
+        }
+        return result;
 
     }
+
+    private String getDefaultRecipient(List<String> recipients,String channel){
+        if(recipients!=null){
+            return recipients.get(0);
+        }
+        return switch(channel){
+            case "sms" ->"+1234567890";
+            case "email" -> "admin@example.com";
+            case "slack"->"#alerts";
+            default->"";
+        };
+
+    }
+
 }
