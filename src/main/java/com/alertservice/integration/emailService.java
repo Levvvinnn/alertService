@@ -42,4 +42,7 @@ public class emailService {
             throw new RuntimeException("Email send fail",e);
         }
     }
+    public double cost(){
+        return 0.001;
+    }
 }
