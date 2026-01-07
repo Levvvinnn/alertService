@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface alertRepository extends JpaRepository<alert,Integer> {
-    List<alert> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
-    List<alert> findBySeverity(String severity);
-    List<alert> findTop10ByOrderByCreatedAtDesc();
+    static List<alert> findTop10ByOrderByCreatedAtDesc() {
+        return null;
+    }
 }

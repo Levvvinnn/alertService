@@ -5,9 +5,10 @@ import com.alertservice.model.alertRequest;
 import com.alertservice.model.alertResponse;
 import com.alertservice.repository.alertRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jdk.internal.org.jline.utils.Log;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.alertservice.integration.smsService;
 import com.alertservice.integration.emailService;
@@ -22,10 +23,24 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class alertService {
-    private smsService smsService;
-    private emailService emailService;
-    private slackService slackService;
-    private ObjectMapper objectMapper;
+    private static final Logger log = LoggerFactory.getLogger(alertService.class);
+    private  smsService smsService;
+    private  emailService emailService;
+    private  slackService slackService;
+    private  ObjectMapper objectMapper;
+
+    public alertService(
+            smsService smsService,
+            emailService emailService,
+            slackService slackService,
+            ObjectMapper objectMapper
+    ) {
+        this.smsService = smsService;
+        this.emailService = emailService;
+        this.slackService = slackService;
+        this.objectMapper = objectMapper;
+    }
+
 
     public alertResponse processAlert(alertRequest request){
         alertResponse response=new alertResponse();
@@ -54,16 +69,24 @@ public class alertService {
         return response;
     }
 
-    private List<String> determineChannels(alertRequest request){
-        if(request.getChannels()!=null||request.getChannels().isEmpty()){
+    private List<String> determineChannels(alertRequest request) {
+        // defensive null checks: if client provided explicit channels, use them
+        if (request != null && request.getChannels() != null && !request.getChannels().isEmpty()) {
             return request.getChannels();
         }
-        return switch(request.getSeverity().toLowerCase()){
-            case "critical"-> Arrays.asList("sms,slack,email");
-            case "warning" -> Arrays.asList("slack,email");
-            default->List.of("slack");
+
+        // fallback based on severity (safely handle null severity)
+        String sev = request == null || request.getSeverity() == null
+                ? ""
+                : request.getSeverity().toLowerCase();
+
+        return switch (sev) {
+            case "critical" -> Arrays.asList("sms", "slack", "email");
+            case "warning"  -> Arrays.asList("slack", "email");
+            default         -> List.of("slack");
         };
     }
+
 
     private alertResponse.channelResult sendToChannel(String channel,String message,String severity,List<String> recipients){
         alertResponse.channelResult result=new alertResponse.channelResult();
@@ -90,7 +113,7 @@ public class alertService {
                     yield sent;
                 }
                 default -> {
-                    Log log=null;
+
                     log.warn("Unknown channel: {}", channel);
                     yield false;
                 }
@@ -98,7 +121,7 @@ public class alertService {
             result.setSuccess(success);
             result.setMessage(success?"Sent successfully":"Failed to send");
         } catch (Exception e) {
-            Log log=null;
+
             log.error("Error sending to {}: {}", channel, e.getMessage());
             result.setSuccess(false);
             result.setMessage("Error: " + e.getMessage());

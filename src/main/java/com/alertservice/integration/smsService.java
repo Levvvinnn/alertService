@@ -3,13 +3,15 @@ package com.alertservice.integration;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import lombok.extern.slf4j.Slf4j;
-import jdk.internal.org.jline.utils.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class smsService {
+    private static final Logger log = LoggerFactory.getLogger(smsService.class);
 
     @Value("${twilio.phone-number}")
     private String fromNumber;
@@ -19,7 +21,6 @@ public class smsService {
 
     public boolean sendSms(String toNumber,String message){
         try{
-            Log log=null;
             if(accountSid==null || accountSid.startsWith("your-")){
                 log.info("SMS sent to {}:{}",toNumber,message);
                 return true;
@@ -33,7 +34,6 @@ public class smsService {
             log.info("SMS sent successfully. SID: {}", twilioMessage.getSid());
             return true;
         }catch(Exception e){
-            Log log=null;
             log.error("Failed to send sms to {}:{}",toNumber,e.getMessage());
             throw new RuntimeException("SMS failed",e);
         }

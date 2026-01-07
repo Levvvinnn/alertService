@@ -1,8 +1,9 @@
 package com.alertservice.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jdk.internal.org.jline.utils.Log;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.http.*;
 @Slf4j
 @RequiredArgsConstructor
 public class slackService {
+    private static final Logger log = LoggerFactory.getLogger(slackService.class);
     @Value("$slack.webhook-url")
     private String webhookurl;
 
@@ -24,7 +26,6 @@ public class slackService {
 
     public boolean sendSlackMessage(String channel,String message,String severity){
         try{
-            Log log=null;
             if(webhookurl==null||webhookurl.startsWith("YOUR/WEBHOOK")){
                 log.info("Slack (SIMULATED) to {}: {}", channel, message);
                 return true;
@@ -43,7 +44,6 @@ public class slackService {
             }
 
         }catch(Exception e){
-            Log log=null;
             log.error("Failed to send slack message :{}",e.getMessage());
             throw new RuntimeException("Slack send failed",e);
         }

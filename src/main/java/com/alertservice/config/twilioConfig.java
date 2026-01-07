@@ -1,15 +1,20 @@
 package com.alertservice.config;
 
-
 import com.twilio.Twilio;
 import jakarta.annotation.PostConstruct;
-import jdk.internal.org.jline.utils.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Slf4j
+@ConditionalOnProperty(
+        prefix = "twilio",
+        name = "enabled",
+        havingValue = "true",
+        matchIfMissing = false
+)
 public class twilioConfig {
 
     @Value("${twilio.account-sid}")
@@ -20,12 +25,6 @@ public class twilioConfig {
 
     @PostConstruct
     public void initTwilio() {
-        Log log = null;
-        if (accountSid != null && !accountSid.startsWith("your-")) {
-            Twilio.init(accountSid, authToken);
-            log.info("Twilio initialized successfully");
-        } else {
-            log.warn("Twilio not configured - SMS will be simulated");
-        }
+        Twilio.init(accountSid, authToken);
     }
 }

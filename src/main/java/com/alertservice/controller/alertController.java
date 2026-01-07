@@ -7,6 +7,8 @@ import com.alertservice.model.alertResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +21,12 @@ import java.util.Map;
 @Slf4j
 @RequestMapping("/api")
 public class alertController {
-
+    private static final Logger log = LoggerFactory.getLogger(alertController.class);
     private final alertService alertService;
+
+    public alertController(alertService alertService) {
+        this.alertService = alertService;
+    }
 
     @PostMapping("/alerts")
     public ResponseEntity<alertResponse> recieveWebhook(@Valid @RequestBody alertRequest request){
