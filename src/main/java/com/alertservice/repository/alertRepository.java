@@ -8,7 +8,5 @@ import java.util.List;
 
 @Repository
 public interface alertRepository extends JpaRepository<alert,Integer> {
-    static List<alert> findTop10ByOrderByCreatedAtDesc() {
-        return null;
-    }
+    List<alert> findTop10ByOrderByCreatedAtDesc();
 }

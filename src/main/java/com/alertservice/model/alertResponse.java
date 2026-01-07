@@ -1,6 +1,5 @@
 package com.alertservice.model;
 
-import lombok.Data;
 import java.util.List;
 import java.util.UUID;
 

@@ -1,40 +1,43 @@
 package com.alertservice.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 
+import java.util.Map;
+
 
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class slackService {
     private static final Logger log = LoggerFactory.getLogger(slackService.class);
-    @Value("$slack.webhook-url")
-    private String webhookurl;
+    private final String webhookurl;
+
 
     private final RestTemplate restTemplate=new RestTemplate();
-    private final ObjectMapper objectMapper=new ObjectMapper();
-    private Object request;
+    public slackService(@Value("${slack.webhook-url:}") String webhookurl) {
+        this.webhookurl = webhookurl;
+    }
 
     public boolean sendSlackMessage(String channel,String message,String severity){
         try{
             if(webhookurl==null||webhookurl.startsWith("YOUR/WEBHOOK")){
-                log.info("Slack (SIMULATED) to {}: {}", channel, message);
+                log.info("Slack (SIMULATED) to {}:{} {}", channel,severity,message);
                 return true;
             }
-            ResponseEntity<String> response=restTemplate.postForEntity(
-                    webhookurl,
-                    request,
-                    String.class
+            Map<String, String> payload = Map.of(
+                    "text", String.format("%s: %s", severity == null ? "ALERT" : severity.toUpperCase(), message),
+                    "channel", channel == null ? "" : channel
             );
+
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<Map<String, String>> req = new HttpEntity<>(payload, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(webhookurl, req, String.class);
+
             if(response.getStatusCode()==HttpStatus.OK){
                 log.info("Slack message sent successfully to {}", channel);
                 return true;

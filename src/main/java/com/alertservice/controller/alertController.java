@@ -5,8 +5,6 @@ import com.alertservice.model.alertRequest;
 import com.alertservice.service.alertService;
 import com.alertservice.model.alertResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequiredArgsConstructor
-@Slf4j
 @RequestMapping("/api")
 public class alertController {
     private static final Logger log = LoggerFactory.getLogger(alertController.class);
@@ -30,7 +26,7 @@ public class alertController {
 
     @PostMapping("/alerts")
     public ResponseEntity<alertResponse> recieveWebhook(@Valid @RequestBody alertRequest request){
-        log.info("Webhook recieved:{}",request);
+        log.info("Webhook received:{}",request);
         alertResponse response=alertService.processAlert(request);
         return ResponseEntity.ok(response);
     }

@@ -1,12 +1,10 @@
 package com.alertservice.service;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.alertservice.entity.alert;
 import com.alertservice.model.alertRequest;
 import com.alertservice.model.alertResponse;
 import com.alertservice.repository.alertRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,24 +18,23 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Slf4j
-@RequiredArgsConstructor
 public class alertService {
     private static final Logger log = LoggerFactory.getLogger(alertService.class);
-    private  smsService smsService;
-    private  emailService emailService;
-    private  slackService slackService;
-    private  ObjectMapper objectMapper;
+    private  final smsService smsService;
+    private  final emailService emailService;
+    private  final slackService slackService;
+    private final alertRepository alertRepository;
+    private final ObjectMapper objectMapper;
 
     public alertService(
             smsService smsService,
             emailService emailService,
-            slackService slackService,
-            ObjectMapper objectMapper
+            slackService slackService, com.alertservice.repository.alertRepository alertRepository, ObjectMapper objectMapper
     ) {
         this.smsService = smsService;
         this.emailService = emailService;
         this.slackService = slackService;
+        this.alertRepository = alertRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -66,21 +63,25 @@ public class alertService {
             }
         }
         response.setChannelResults(results);
+        long successCount = results.stream().filter(alertResponse.channelResult::isSuccess).count();
+        if (successCount == results.size()) {
+            response.setStatus("success");
+        } else if (successCount > 0) {
+            response.setStatus("partial");
+        } else {
+            response.setStatus("failed");
+        }
+        saveAlert(request, response, totalCost);
         return response;
     }
 
     private List<String> determineChannels(alertRequest request) {
-        // defensive null checks: if client provided explicit channels, use them
         if (request != null && request.getChannels() != null && !request.getChannels().isEmpty()) {
             return request.getChannels();
         }
+        String severe = request == null || request.getSeverity() == null ? "" : request.getSeverity().toLowerCase();
 
-        // fallback based on severity (safely handle null severity)
-        String sev = request == null || request.getSeverity() == null
-                ? ""
-                : request.getSeverity().toLowerCase();
-
-        return switch (sev) {
+        return switch (severe) {
             case "critical" -> Arrays.asList("sms", "slack", "email");
             case "warning"  -> Arrays.asList("slack", "email");
             default         -> List.of("slack");
@@ -129,10 +130,32 @@ public class alertService {
         return result;
 
     }
+    private void saveAlert(alertRequest request,alertResponse response,double cost){
+        try{
+            alert alert=new alert();
+            alert.setMessage(request.getMessage());
+            alert.setSeverity(request.getSeverity());
+            alert.setEvent(request.getEvent());
+            alert.setStatus(response.getStatus());
+            alert.setCost(cost);
+            List<String> channels = response.getChannelResults().stream()
+                    .map(alertResponse.channelResult::getChannel)
+                    .toList();
+            alert.setChannelsSent(String.join(",", channels));
 
+            if (request.getMetadata() != null) {
+                alert.setMetadata(objectMapper.writeValueAsString(request.getMetadata()));
+            }
+
+            alertRepository.save(alert);
+            log.info("Alert saved to database with ID: {}", alert.getId());
+        } catch (Exception e) {
+            log.error("Failed to save alert to database: {}", e.getMessage());
+        }
+    }
     private String getDefaultRecipient(List<String> recipients,String channel){
         if(recipients!=null){
-            return recipients.get(0);
+            return recipients.getFirst();
         }
         return switch(channel){
             case "sms" ->"+1234567890";

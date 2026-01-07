@@ -20,9 +20,9 @@ public class alert {
     private String event;
 
     @Column(nullable = false)
-    private Integer severity;
+    private String severity;
 
-    @Column(name="Channels_Sent")
+    @Column(name="ChannelsSent")
     private String channels;
 
     @Column(name="Status")
@@ -66,11 +66,11 @@ public class alert {
         this.event = event;
     }
 
-    public Integer getSeverity() {
+    public String getSeverity() {
         return severity;
     }
 
-    public void setSeverity(Integer severity) {
+    public void setSeverity(String severity) {
         this.severity = severity;
     }
 
@@ -112,5 +112,9 @@ public class alert {
 
     public void setMetadata(String metadata) {
         this.metadata = metadata;
+    }
+
+    public void setChannelsSent(String join) {
+        this.channels=join;
     }
 }
