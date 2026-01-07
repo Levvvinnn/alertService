@@ -5,7 +5,6 @@ import com.alertservice.model.alertRequest;
 import com.alertservice.service.alertService;
 import com.alertservice.model.alertResponse;
 import jakarta.validation.Valid;
-import jdk.internal.org.jline.utils.Log;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +22,8 @@ public class alertController {
 
     private final alertService alertService;
 
-    public alertController(alertService alertService) {
-        this.alertService = alertService;
-    }
-
-
     @PostMapping("/alerts")
     public ResponseEntity<alertResponse> recieveWebhook(@Valid @RequestBody alertRequest request){
-        Log log=null;
         log.info("Webhook recieved:{}",request);
         alertResponse response=alertService.processAlert(request);
         return ResponseEntity.ok(response);
@@ -48,7 +41,7 @@ public class alertController {
         health.put("Service","Alert-Service");
         health.put("Status","UP");
         health.put("Version","1.0.0");
-        ResponseEntity.ok(health);
+        return ResponseEntity.ok(health);
     }
 
     @GetMapping("test/{severity}")
@@ -58,7 +51,7 @@ public class alertController {
         request.setSeverity(severity);
         request.setEvent("Test alert");
         alertResponse response=alertService.processAlert(request);
-        ResponseEntity.ok(response);
+        return ResponseEntity.ok(response);
     }
 
 
