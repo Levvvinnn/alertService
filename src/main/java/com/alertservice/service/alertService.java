@@ -1,7 +1,9 @@
 package com.alertservice.service;
 
+import com.alertservice.entity.alert;
 import com.alertservice.model.alertRequest;
 import com.alertservice.model.alertResponse;
+import com.alertservice.repository.alertRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jdk.internal.org.jline.utils.Log;
 import lombok.RequiredArgsConstructor;
@@ -116,6 +118,9 @@ public class alertService {
             default->"";
         };
 
+    }
+    public List<alert> getRecentAlerts(){
+        return alertRepository.findTop10ByOrderByCreatedAtDesc();
     }
 
 }
