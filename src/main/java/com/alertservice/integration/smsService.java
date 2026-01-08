@@ -15,7 +15,7 @@ public class smsService {
     @Value("${twilio.phone-number}")
     private String fromNumber;
 
-    @Value("${twilio.account-sid")
+    @Value("${twilio.account-sid:}")
     private String accountSid;
 
     @Value("${twilio.auth-token:}")
