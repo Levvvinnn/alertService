@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 public class smsService {
     private static final Logger log = LoggerFactory.getLogger(smsService.class);
 
@@ -18,6 +17,10 @@ public class smsService {
 
     @Value("${twilio.account-sid")
     private String accountSid;
+
+    @Value("${twilio.auth-token:}")
+    private String authToken;
+
 
     public boolean sendSms(String toNumber,String message){
         try{
