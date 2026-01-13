@@ -2,19 +2,18 @@ package com.alertservice.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Generated;
 
 import java.time.Instant;
 
 @Entity
 @Table(name = "alerts")
 @Data
-public class alert {
+public class Alert {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false,length = 1000)
+    @Column(nullable = false, length = 1000)
     private String message;
 
     private String event;
@@ -22,25 +21,27 @@ public class alert {
     @Column(nullable = false)
     private String severity;
 
-    @Column(name="ChannelsSent")
-    private String channels;
+    // map to channels_sent (DB column)
+    @Column(name = "channels_sent")
+    private String channelsSent;
 
-    @Column(name="Status")
     private String status;
 
-    @Column(name="Cost")
     private Double cost;
 
-    @Column(name="Created_At")
+    // map to created_at (DB column)
+    @Column(name = "created_at")
     private Instant createdAt;
 
-    @Column(name="metadata",length=2000)
+    // mark columnDefinition so DB type is explicit (jsonb)
+    @Column(name = "metadata", columnDefinition = "jsonb")
     private String metadata;
 
     @PrePersist
-    protected void onCreate(){
-        createdAt=Instant.now();
+    protected void onCreate() {
+        if (createdAt == null) createdAt = Instant.now();
     }
+
 
     public Integer getId() {
         return id;
@@ -75,11 +76,11 @@ public class alert {
     }
 
     public String getChannels() {
-        return channels;
+        return channelsSent;
     }
 
     public void setChannels(String channels) {
-        this.channels = channels;
+        this.channelsSent = channels;
     }
 
     public String getStatus() {
@@ -115,6 +116,6 @@ public class alert {
     }
 
     public void setChannelsSent(String join) {
-        this.channels=join;
+        this.channelsSent=join;
     }
 }
