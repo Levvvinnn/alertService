@@ -12,10 +12,10 @@ import com.alertservice.integration.smsService;
 import com.alertservice.integration.emailService;
 import com.alertservice.integration.slackService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class alertService {
@@ -138,11 +138,10 @@ public class alertService {
             alert.setEvent(request.getEvent());
             alert.setStatus(response.getStatus());
             alert.setCost(cost);
-            List<String> channels = response.getChannelResults().stream()
+            Set<String> channelsSet = response.getChannelResults().stream()
                     .map(alertResponse.channelResult::getChannel)
-                    .toList();
-            alert.setChannelsSent(String.join(",", channels));
-
+                    .collect(Collectors.toSet());
+            alert.setChannelsSent(channelsSet);
             if (request.getMetadata() != null) {
                 alert.setMetadata(objectMapper.writeValueAsString(request.getMetadata()));
             }
