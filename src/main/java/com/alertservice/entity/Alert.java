@@ -2,6 +2,12 @@ package com.alertservice.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import java.util.Set;
+import java.util.HashSet;
 
 import java.time.Instant;
 
@@ -22,8 +28,18 @@ public class Alert {
     private String severity;
 
     // map to channels_sent column in DB
-    @Column(name = "channels_sent")
-    private String channels;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "alert_channels_sent")
+    @Column(name = "channel")
+    private Set<String> channelsSent = new HashSet<>();
+
+    public Set<String> getChannelsSent() {
+        return channelsSent;
+    }
+
+    public void setChannelsSent(Set<String> channelsSent) {
+        this.channelsSent = channelsSent;
+    }
 
     @Column(name = "status")
     private String status;
@@ -77,13 +93,6 @@ public class Alert {
         this.severity = severity;
     }
 
-    public String getChannels() {
-        return channelsSent;
-    }
-
-    public void setChannels(String channels) {
-        this.channelsSent = channels;
-    }
 
     public String getStatus() {
         return status;
@@ -117,7 +126,5 @@ public class Alert {
         this.metadata = metadata;
     }
 
-    public void setChannelsSent(String join) {
-        this.channelsSent=join;
-    }
+
 }
