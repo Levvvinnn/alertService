@@ -1,6 +1,6 @@
 package com.alertservice.controller;
 
-import com.alertservice.entity.alert;
+import com.alertservice.entity.Alert;
 import com.alertservice.model.alertRequest;
 import com.alertservice.service.alertService;
 import com.alertservice.model.alertResponse;
@@ -32,8 +32,8 @@ public class alertController {
     }
 
     @GetMapping("/alerts/history")
-    public ResponseEntity<List<alert>> getHistory(){
-        List<alert> alerts=alertService.getRecentAlerts();
+    public ResponseEntity<List<Alert>> getHistory(){
+        List<Alert> alerts=alertService.getRecentAlerts();
         return ResponseEntity.ok(alerts);
     }
 

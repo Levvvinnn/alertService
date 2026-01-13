@@ -1,7 +1,7 @@
 package com.alertservice.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.alertservice.entity.alert;
+import com.alertservice.entity.Alert;
 import com.alertservice.model.alertRequest;
 import com.alertservice.model.alertResponse;
 import com.alertservice.repository.alertRepository;
@@ -132,7 +132,7 @@ public class alertService {
     }
     private void saveAlert(alertRequest request,alertResponse response,double cost){
         try{
-            alert alert=new alert();
+            Alert alert=new Alert();
             alert.setMessage(request.getMessage());
             alert.setSeverity(request.getSeverity());
             alert.setEvent(request.getEvent());
@@ -165,7 +165,7 @@ public class alertService {
         };
 
     }
-    public List<alert> getRecentAlerts(){
+    public List<Alert> getRecentAlerts(){
         return alertRepository.findTop10ByOrderByCreatedAtDesc();
     }
 
