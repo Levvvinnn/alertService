@@ -21,20 +21,22 @@ public class Alert {
     @Column(nullable = false)
     private String severity;
 
-    // map to channels_sent (DB column)
+    // map to channels_sent column in DB
     @Column(name = "channels_sent")
-    private String channelsSent;
+    private String channels;
 
+    @Column(name = "status")
     private String status;
 
+    @Column(name = "cost")
     private Double cost;
 
-    // map to created_at (DB column)
+    // map to created_at column
     @Column(name = "created_at")
     private Instant createdAt;
 
-    // mark columnDefinition so DB type is explicit (jsonb)
-    @Column(name = "metadata", columnDefinition = "jsonb")
+    // tell Hibernate the DB column type is jsonb
+    @Column(name = "metadata", columnDefinition = "jsonb", length = 2000)
     private String metadata;
 
     @PrePersist
