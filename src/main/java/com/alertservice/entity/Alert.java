@@ -17,7 +17,7 @@ import java.time.Instant;
 public class Alert {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false, length = 1000)
     private String message;
@@ -61,11 +61,11 @@ public class Alert {
     }
 
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
