@@ -3,6 +3,7 @@ package com.alertservice.integration;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class emailService {
     private static final Logger log = LoggerFactory.getLogger(emailService.class);
+    @Autowired(required = false)
     private JavaMailSender mailSender;
 
     @Value("$alert.channels.email.from")
@@ -24,6 +26,10 @@ public class emailService {
         try{
             if(smtpUsername==null||smtpUsername.startsWith("your-email")){
                 log.info("Email (SIMULATED) to {}: {}", emailTo, subject);
+                return true;
+            }
+            if (mailSender == null) {
+                log.info("Mail sender bean not configured — skipping real send (SIMULATED) to {}: {}", emailTo, subject);
                 return true;
             }
             SimpleMailMessage message=new SimpleMailMessage();
