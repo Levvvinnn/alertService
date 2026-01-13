@@ -14,20 +14,28 @@ import java.util.Map;
 @Service
 public class slackService {
     private static final Logger log = LoggerFactory.getLogger(slackService.class);
+
+    // your existing webhook value
     private final String webhookurl;
 
+    // new flag to allow simulation via app.simulate.slack in application.yml
+    @Value("${app.simulate.slack:false}")
+    private boolean simulateSlack;
 
-    private final RestTemplate restTemplate=new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate();
+
     public slackService(@Value("${slack.webhook-url:}") String webhookurl) {
         this.webhookurl = webhookurl;
     }
 
-    public boolean sendSlackMessage(String channel,String message,String severity){
-        try{
-            if(webhookurl==null||webhookurl.startsWith("YOUR/WEBHOOK")){
-                log.info("Slack (SIMULATED) to {}:{} {}", channel,severity,message);
+    public boolean sendSlackMessage(String channel, String message, String severity) {
+        try {
+            // treat empty/blank webhook as simulated as well
+            if (simulateSlack || webhookurl == null || webhookurl.isBlank() || webhookurl.startsWith("YOUR/WEBHOOK")) {
+                log.info("Slack (SIMULATED) to {}:{} {}", channel, severity, message);
                 return true;
             }
+
             Map<String, String> payload = Map.of(
                     "text", String.format("%s: %s", severity == null ? "ALERT" : severity.toUpperCase(), message),
                     "channel", channel == null ? "" : channel
@@ -38,7 +46,7 @@ public class slackService {
 
             ResponseEntity<String> response = restTemplate.postForEntity(webhookurl, req, String.class);
 
-            if(response.getStatusCode()==HttpStatus.OK){
+            if (response.getStatusCode() == HttpStatus.OK) {
                 log.info("Slack message sent successfully to {}", channel);
                 return true;
             } else {
@@ -46,20 +54,23 @@ public class slackService {
                 return false;
             }
 
-        }catch(Exception e){
-            log.error("Failed to send slack message :{}",e.getMessage());
-            throw new RuntimeException("Slack send failed",e);
+        } catch (Exception e) {
+            log.error("Failed to send slack message :{}", e.getMessage());
+            throw new RuntimeException("Slack send failed", e);
         }
     }
-    private String formatMessage(String message,String severity){
-        String label=switch(severity.toLowerCase()){
-            case "critical"->"⚠️";
-            case "warning"->"🚨";
-            default->"ℹ️";
+
+    private String formatMessage(String message, String severity) {
+        String sev = (severity == null) ? "info" : severity.toLowerCase();
+        String label = switch (sev) {
+            case "critical" -> "⚠️";
+            case "warning" -> "🚨";
+            default -> "ℹ️";
         };
-        return label+severity.toUpperCase()+message;
+        return label + sev.toUpperCase() + message;
     }
-    public double cost(){
+
+    public double cost() {
         return 0.0;
     }
 
