@@ -153,8 +153,9 @@ public class alertService {
         }
     }
     private String getDefaultRecipient(List<String> recipients,String channel){
-        if(recipients!=null){
-            return recipients.getFirst();
+        String firstRecipient = (recipients != null && !recipients.isEmpty()) ? recipients.get(0) : null;
+        if (firstRecipient != null && !firstRecipient.isBlank()) {
+            return firstRecipient;
         }
         return switch(channel){
             case "sms" ->"+1234567890";
