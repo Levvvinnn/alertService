@@ -9,10 +9,10 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 import java.util.Map;
 
-@Data // Generates getters, setters, equals, hashCode, and toString methods
-@NoArgsConstructor // Generates a no-argument constructor
-@AllArgsConstructor // Generates an all-argument constructor
-@Builder // Adds a builder pattern for object creation
+@Data 
+@NoArgsConstructor 
+@AllArgsConstructor 
+@Builder 
 public class alertRequest {
 
     @NotBlank(message = "Message Required")
