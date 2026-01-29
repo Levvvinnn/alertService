@@ -1,5 +1,6 @@
 package com.alertservice.integration;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -12,16 +13,17 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class slackService {
     private final String webhookurl;
+    private final RestTemplate restTemplate;
 
     @Value("${app.simulate.slack:false}")
     private boolean simulateSlack;
 
-    private final RestTemplate restTemplate = new RestTemplate();
-
     public slackService(@Value("${slack.webhook-url:}") String webhookurl) {
         this.webhookurl = webhookurl;
+        this.restTemplate = new RestTemplate();
     }
 
     public boolean sendSlackMessage(String channel, String message, String severity) {

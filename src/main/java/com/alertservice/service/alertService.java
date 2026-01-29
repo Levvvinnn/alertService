@@ -15,11 +15,8 @@ import com.alertservice.integration.slackService;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import lombok.Builder;
-
 @Service
 @RequiredArgsConstructor
-@Builder
 @Slf4j
 public class alertService {
     private final smsService smsService;

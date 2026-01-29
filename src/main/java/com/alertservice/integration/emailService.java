@@ -15,10 +15,10 @@ public class emailService {
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
-    @Value("$alert.channels.email.from")
+    @Value("${alert.channels.email.from}")
     private String fromEmail;
 
-    @Value("$spring.mail.username")
+    @Value("${spring.mail.username}")
     private String smtpUsername;
 
     public boolean sendEmailTo(String emailTo,String subject, String body){
