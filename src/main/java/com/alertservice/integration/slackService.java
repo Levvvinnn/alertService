@@ -1,7 +1,6 @@
 package com.alertservice.integration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,13 +11,10 @@ import java.util.Map;
 
 
 @Service
+@Slf4j
 public class slackService {
-    private static final Logger log = LoggerFactory.getLogger(slackService.class);
-
-    // your existing webhook value
     private final String webhookurl;
 
-    // new flag to allow simulation via app.simulate.slack in application.yml
     @Value("${app.simulate.slack:false}")
     private boolean simulateSlack;
 

@@ -29,7 +29,6 @@ public class Alert {
     @Column(nullable = false)
     private String severity;
 
-    // map to channels_sent column in DB
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "alert_channels_sent")
     @Column(name = "channel")
