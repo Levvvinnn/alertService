@@ -52,6 +52,4 @@ public class alertController {
         alertResponse response = alertService.processAlert(request);
         return ResponseEntity.ok(response);
     }
-
-
 }
