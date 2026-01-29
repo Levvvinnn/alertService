@@ -38,7 +38,6 @@ public class alertService {
                     request.getMessage(),
                     request.getSeverity(),
                     request.getRecipients()
-
             );
             results.add(result);
             if(result.getCost()!=null){
