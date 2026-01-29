@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 public class smsService {
     private static final Logger log = LoggerFactory.getLogger(smsService.class);
 
-    // provide empty defaults so placeholder resolution never fails
     @Value("${twilio.phone-number:}")
     private String fromNumber;
 

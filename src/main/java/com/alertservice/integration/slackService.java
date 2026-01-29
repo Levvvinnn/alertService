@@ -37,14 +37,14 @@ public class slackService {
             }
 
             Map<String, String> payload = Map.of(
-                    "text", String.format("%s: %s", severity == null ? "ALERT" : severity.toUpperCase(), message),
-                    "channel", channel == null ? "" : channel
+                    "text", String.format("%s: %s", severity != null ? severity.toUpperCase() : "ALERT", message),
+                    "channel", channel != null ? channel : ""
             );
 
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<Map<String, String>> req = new HttpEntity<>(payload, headers);
 
-            ResponseEntity<String> response = restTemplate.postForEntity(webhookurl, req, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(webhookurl != null ? webhookurl : "", req, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK) {
                 log.info("Slack message sent successfully to {}", channel);
@@ -58,16 +58,6 @@ public class slackService {
             log.error("Failed to send slack message :{}", e.getMessage());
             throw new RuntimeException("Slack send failed", e);
         }
-    }
-
-    private String formatMessage(String message, String severity) {
-        String sev = (severity == null) ? "info" : severity.toLowerCase();
-        String label = switch (sev) {
-            case "critical" -> "⚠️";
-            case "warning" -> "🚨";
-            default -> "ℹ️";
-        };
-        return label + sev.toUpperCase() + message;
     }
 
     public double cost() {
