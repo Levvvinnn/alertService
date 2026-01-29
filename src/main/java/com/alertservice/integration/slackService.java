@@ -28,7 +28,6 @@ public class slackService {
 
     public boolean sendSlackMessage(String channel, String message, String severity) {
         try {
-            // treat empty/blank webhook as simulated as well
             if (simulateSlack || webhookurl == null || webhookurl.isBlank() || webhookurl.startsWith("YOUR/WEBHOOK")) {
                 log.info("Slack (SIMULATED) to {}:{} {}", channel, severity, message);
                 return true;

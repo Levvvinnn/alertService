@@ -118,6 +118,7 @@ public class alertService {
                     .build();
         }
     }
+    
     private void saveAlert(alertRequest request,alertResponse response,double cost){
         try{
             Set<String> channelsSet = response.getChannelResults().stream()
@@ -147,6 +148,7 @@ public class alertService {
             log.error("Failed to save alert to database: {}", e.getMessage());
         }
     }
+    
     private String getDefaultRecipient(List<String> recipients,String channel){
         String firstRecipient = (recipients != null && !recipients.isEmpty()) ? recipients.get(0) : null;
         if (firstRecipient != null && !firstRecipient.isBlank()) {
@@ -158,8 +160,8 @@ public class alertService {
             case "slack"->"#alerts";
             default->"";
         };
-
     }
+    
     public List<Alert> getRecentAlerts(){
         return alertRepository.findTop10ByOrderByCreatedAtDesc();
     }
